@@ -3,6 +3,7 @@
 /* eslint-disable no-console */
 import 'reflect-metadata';
 import type { AutoloadPluginOptions } from '@fastify/autoload';
+import { fastifyTRPCPlugin } from '@trpc/server/adapters/fastify';
 import AutoLoad from '@fastify/autoload';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
@@ -37,6 +38,8 @@ import serverVersion from 'fastify-server-version';
 import fastifyZodValidate from 'fastify-zod-validate';
 import fjwt from '@fastify/jwt';
 import fastifyETag from '@fastify/etag';
+import { appRouter } from './router.js';
+import { createContext } from './context.js';
 // import fastifyViews from "@fastify/view";
 // import * as eta from "eta";
 
@@ -112,6 +115,11 @@ const fastify: FastifyPluginAsync<AppOptions> = async (app): Promise<void> => {
 	});
 	await app.register(fastifyJSON5);
 	await app.register(serverVersion());
+
+	await app.register(fastifyTRPCPlugin, {
+		prefix: '/trpc',
+		trpcOptions: { router: appRouter, createContext },
+	});
 	await app.register(fjwt, {
 		secret: 'supersecret',
 	});

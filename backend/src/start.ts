@@ -94,6 +94,7 @@ const start = async () => {
 					target: 'pino-pretty',
 				},
 			},
+			maxParamLength: 5000,
 			trustProxy: process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test',
 			// Required: Enable TLS
 			// https: true,
