@@ -103,7 +103,6 @@ const start = async () => {
 			// http2: true
 		}),
 	);
-	nestApp.useStaticAssets({ root: join(__dirname, '..', 'public') });
 	nestApp.enableVersioning();
 	// nestApp.useStaticAssets({
 	// 	root: join(__dirname, "..", "views"),

@@ -24,6 +24,7 @@ import userAgent from 'useragent';
 import fastifyCookie from '@fastify/cookie';
 import fastifyIP from 'fastify-ip';
 import fastify405 from 'fastify-204';
+import fastifyStatic from '@fastify/static';
 import fastifyRouteStats from '@fastify/routes-stats';
 import { fastifyAnalytics } from 'node-api-analytics';
 import fastifyXML from 'fastify-xml-body-parser';
@@ -38,6 +39,7 @@ import serverVersion from 'fastify-server-version';
 import fastifyZodValidate from 'fastify-zod-validate';
 import fjwt from '@fastify/jwt';
 import fastifyETag from '@fastify/etag';
+import { readFile } from 'node:fs/promises';
 import { appRouter } from './router.js';
 import { createContext } from './context.js';
 // import fastifyViews from "@fastify/view";
@@ -91,6 +93,9 @@ const fastify: FastifyPluginAsync<AppOptions> = async (app): Promise<void> => {
 	// If it's longer or more important, it should be in it's own file.
 	await app.register(helmet, {
 		contentSecurityPolicy: false,
+		noSniff: false,
+		ieNoOpen: false,
+		dnsPrefetchControl: false,
 	});
 	// Cannot read properties of undefined (reading 'Symbol(ServerTiming)')
 	await app.register(fastifyResponseTime);
@@ -102,6 +107,9 @@ const fastify: FastifyPluginAsync<AppOptions> = async (app): Promise<void> => {
 	await app.register(fastifyUserAgent);
 	await app.register(fastifyAllow);
 	await app.register(fastifyIP);
+	await app.register(fastifyStatic, {
+		root: join(__dirname, '..', 'public'),
+	});
 	await app.register(fastifyXML);
 	await app.register(fastifyFormBody);
 	await app.register(fastifyQS);
@@ -175,6 +183,18 @@ const fastify: FastifyPluginAsync<AppOptions> = async (app): Promise<void> => {
 	});
 	app.get('/helloz', async () => {
 		return 'Hello World!';
+	});
+	app.post('/body', async request => {
+		return {
+			// eslint-disable-next-line unicorn/no-null
+			body: request.body || null,
+			files: request.files,
+			note: "Anytihing this endpoint gives you is from your request body, and shouldn't be trusted!",
+		};
+	});
+	app.get('/json-schema', async () => {
+		const schemaFile = await readFile(join(__dirname, '..', 'prisma', 'json-schema', 'json-schema.json'), 'utf8');
+		return JSON.parse(schemaFile);
 	});
 	app.get('/exit', async (_request, reply) => {
 		app.log.info('Recieved request to exit. EXITING 😭😭😭');

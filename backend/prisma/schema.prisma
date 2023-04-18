@@ -52,9 +52,9 @@ model User {
   // The user's password hash
   // HAHAHA No, we don't do that here
   // I can't be trusted with passwords ☠️
-  DiscordAccount DiscordAccount?
+  discordAccount DiscordAccount?
 
-  TwitchAccount TwitchAccount?
+  twitchAccount TwitchAccount?
 }
 
 model MojangAccount {
@@ -81,12 +81,12 @@ model TwitchAccount {
 }
 
 model Post {
-  id     Int  @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   title     String
   content   String?
   published Boolean? @default(false)
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
 }
 
 enum Role {
